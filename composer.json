@@ -1,0 +1,19 @@
+{
+    "name": "peteryang/yyproject",
+    "description": "ok",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "PeterYangs",
+            "email": "904801074@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Auth\\Start\\": "src/Auth"
+        }
+    }
+}
