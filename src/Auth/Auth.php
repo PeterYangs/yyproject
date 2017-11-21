@@ -55,7 +55,12 @@ class Auth {
     protected $user='user';//用户表
 
 
-
+    /**
+     * Create by Peter
+     * @param $rule         权限码
+     * @param $uid          用户id
+     * @return array|bool   超级管理员返回true，没有这个权限返回false，有权限返回整个权限数组
+     */
     function check($rule,$uid){
 
 
@@ -74,7 +79,12 @@ class Auth {
 
     }
 
-
+    /**
+     * 获取权限列表
+     * Create by Peter
+     * @param $uid
+     * @return array|bool
+     */
     protected function getRuleList($uid){
 
 
