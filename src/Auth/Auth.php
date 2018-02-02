@@ -42,6 +42,55 @@ UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='权限规则表';
  */
 
+
+
+//新
+
+/**
+SET FOREIGN_KEY_CHECKS=0;
+
+-- ----------------------------
+-- Table structure for auth_group
+                       -- ----------------------------
+DROP TABLE IF EXISTS `auth_group`;
+CREATE TABLE `auth_group` (
+`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `title` char(100) NOT NULL DEFAULT '' COMMENT '用户组（角色）名',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态,暂未用到',
+  `rules` varchar(1000) NOT NULL DEFAULT '' COMMENT '权限表id,用逗号分开',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户组表';
+
+-- ----------------------------
+-- Table structure for auth_group_access
+                       -- ----------------------------
+DROP TABLE IF EXISTS `auth_group_access`;
+CREATE TABLE `auth_group_access` (
+`uid` mediumint(8) unsigned NOT NULL COMMENT '用户id，一般对应后台管理员id',
+  `group_id` mediumint(8) unsigned NOT NULL COMMENT '用户组（角色）表id',
+  UNIQUE KEY `uid_group_id` (`uid`,`group_id`),
+  KEY `uid` (`uid`),
+  KEY `group_id` (`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户组明细表';
+
+-- ----------------------------
+-- Table structure for auth_rule
+                       -- ----------------------------
+DROP TABLE IF EXISTS `auth_rule`;
+CREATE TABLE `auth_rule` (
+`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `name` char(80) NOT NULL DEFAULT '' COMMENT '权限码名称，一般用 controller+action',
+  `title` char(50) NOT NULL DEFAULT '' COMMENT '权限码描述',
+  `type` tinyint(1) NOT NULL DEFAULT '1',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态，暂未用到',
+  `condition` char(100) NOT NULL DEFAULT '' COMMENT '暂未用到',
+  `group_name` varchar(255) NOT NULL DEFAULT '' COMMENT '分组名称，权限码太多了，做一下显示分组，比如商品管理组',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='权限码表';
+*/
+
+
 class Auth {
 
 
@@ -55,17 +104,16 @@ class Auth {
     protected $user='user';//用户表
 
 
-    /**
-     * Create by Peter
-     * @param $rule         权限码
-     * @param $uid          用户id
-     * @return array|bool   超级管理员返回true，没有这个权限返回false，有权限返回整个权限数组
-     */
+
     function check($rule,$uid){
 
 
+        //转小写
+        $rule=strtolower($rule);
 
         $list= $this->getRuleList($uid);
+
+
 
         if($list===true)  return true;
 
@@ -79,12 +127,7 @@ class Auth {
 
     }
 
-    /**
-     * 获取权限列表
-     * Create by Peter
-     * @param $uid
-     * @return array|bool
-     */
+
     protected function getRuleList($uid){
 
 
@@ -110,8 +153,20 @@ class Auth {
         if(!$res) return [];
 
 
-        return array_column($res,'name');
+        //取这个数组列表name值，合并成新数组
+        $res=array_column($res,'name');
 
+        $arr=[];
+        //全部转小写
+        foreach ($res as $key=>$value){
+
+            $v=strtolower($value);
+
+            $arr[]=$v;
+        }
+
+
+        return $arr;
 
 
     }
