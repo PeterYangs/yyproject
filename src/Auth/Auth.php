@@ -104,7 +104,13 @@ class Auth {
     protected $user='user';//用户表
 
 
-
+    /**
+     * 权限检查,返回true为超级管理员，数组为拥有的权限列表，false为不通过
+     * Create by Peter
+     * @param $rule      验证的权限，一般为路由地址的拼接
+     * @param $uid       用户id
+     * @return array|bool
+     */
     function check($rule,$uid){
 
 
@@ -127,7 +133,12 @@ class Auth {
 
     }
 
-
+    /**
+     * 获取权限列表
+     * Create by Peter
+     * @param $uid   用户id
+     * @return array|bool
+     */
     protected function getRuleList($uid){
 
 
@@ -171,6 +182,40 @@ class Auth {
 
     }
 
+
+    /**
+     * 对当前用户的可见的菜单连接进行筛选
+     * Create by Peter
+     * @param $menu 完整列表,见配置文件数组
+     * @param $auth array 拥有的列表，授权类返回的数组
+     * @return array
+     */
+    function filter_menu($menu,$auth=[]){
+
+        $new_menu=array();
+        foreach ($menu as $key=>$value){
+
+
+            foreach ($value as $key1=>$value1){
+
+                if(in_array(($value1),$auth)){
+
+                    $new_menu[$key][$key1]=$value1;
+                }
+
+
+            }
+
+
+        }
+
+
+
+        return $new_menu;
+
+
+
+    }
 
 
 
