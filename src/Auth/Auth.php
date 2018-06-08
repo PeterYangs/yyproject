@@ -6,90 +6,41 @@ use think\Db;
 DROP TABLE IF EXISTS `think_auth_group`;
 CREATE TABLE `think_auth_group` (
 `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-`title` char(100) NOT NULL DEFAULT '' COMMENT '用户组（角色）名',
-`status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
-`rules` char(80) NOT NULL DEFAULT '' COMMENT '权限表id,用逗号分开',
-PRIMARY KEY (`id`)
+  `title` char(100) NOT NULL DEFAULT '' COMMENT '用户组（角色）名',
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态',
+  `rules` char(80) NOT NULL DEFAULT '' COMMENT '权限表id,用逗号分开',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 COMMENT='权限用户（角色）组表';
 
 
 -- ----------------------------
 -- Table structure for `think_auth_group_access`
--- ----------------------------
+                       -- ----------------------------
 DROP TABLE IF EXISTS `think_auth_group_access`;
 CREATE TABLE `think_auth_group_access` (
 `uid` mediumint(8) unsigned NOT NULL,
-`group_id` mediumint(8) unsigned NOT NULL,
-UNIQUE KEY `uid_group_id` (`uid`,`group_id`),
-KEY `uid` (`uid`),
-KEY `group_id` (`group_id`)
+  `group_id` mediumint(8) unsigned NOT NULL,
+  UNIQUE KEY `uid_group_id` (`uid`,`group_id`),
+  KEY `uid` (`uid`),
+  KEY `group_id` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户明显表（用户属于哪个用户组）';
 
 
 -- ----------------------------
 -- Table structure for `think_auth_rule`
--- ----------------------------
+                       -- ----------------------------
 DROP TABLE IF EXISTS `think_auth_rule`;
 CREATE TABLE `think_auth_rule` (
 `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-`name` char(80) NOT NULL DEFAULT '',
-`title` char(20) NOT NULL DEFAULT '',
-`type` tinyint(1) NOT NULL DEFAULT '1',
-`status` tinyint(1) NOT NULL DEFAULT '1',
-`condition` char(100) NOT NULL DEFAULT '',
-PRIMARY KEY (`id`),
-UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='权限规则表';
- */
-
-
-
-//新
-
-/**
-SET FOREIGN_KEY_CHECKS=0;
-
--- ----------------------------
--- Table structure for auth_group
-                       -- ----------------------------
-DROP TABLE IF EXISTS `auth_group`;
-CREATE TABLE `auth_group` (
-`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `title` char(100) NOT NULL DEFAULT '' COMMENT '用户组（角色）名',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态,暂未用到',
-  `rules` varchar(1000) NOT NULL DEFAULT '' COMMENT '权限表id,用逗号分开',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COMMENT='用户组表';
-
--- ----------------------------
--- Table structure for auth_group_access
-                       -- ----------------------------
-DROP TABLE IF EXISTS `auth_group_access`;
-CREATE TABLE `auth_group_access` (
-`uid` mediumint(8) unsigned NOT NULL COMMENT '用户id，一般对应后台管理员id',
-  `group_id` mediumint(8) unsigned NOT NULL COMMENT '用户组（角色）表id',
-  UNIQUE KEY `uid_group_id` (`uid`,`group_id`),
-  KEY `uid` (`uid`),
-  KEY `group_id` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户组明细表';
-
--- ----------------------------
--- Table structure for auth_rule
-                       -- ----------------------------
-DROP TABLE IF EXISTS `auth_rule`;
-CREATE TABLE `auth_rule` (
-`id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `name` char(80) NOT NULL DEFAULT '' COMMENT '权限码名称，一般用 controller+action',
-  `title` char(50) NOT NULL DEFAULT '' COMMENT '权限码描述',
+  `name` char(80) NOT NULL DEFAULT '',
+  `title` char(20) NOT NULL DEFAULT '',
   `type` tinyint(1) NOT NULL DEFAULT '1',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态，暂未用到',
-  `condition` char(100) NOT NULL DEFAULT '' COMMENT '暂未用到',
-  `group_name` varchar(255) NOT NULL DEFAULT '' COMMENT '分组名称，权限码太多了，做一下显示分组，比如商品管理组',
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `condition` char(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='权限码表';
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8 COMMENT='权限规则表';
 */
-
 
 class Auth {
 
@@ -104,30 +55,24 @@ class Auth {
     protected $user='user';//用户表
 
 
-    /**
-     * 权限检查,返回true为超级管理员，数组为拥有的权限列表，false为不通过
-     * Create by Peter
-     * @param $rule      验证的权限，一般为路由地址的拼接
-     * @param $uid       用户id
-     * @return array|bool
-     */
+
     function check($rule,$uid){
 
 
         //转小写
         $rule=strtolower($rule);
 
-        $list= $this->getRuleList($uid);
+      $list= $this->getRuleList($uid);
 
 
 
-        if($list===true)  return true;
+      if($list===true)  return true;
 
-        if(!$list) return [];
+      if(!$list) return [];
 
-        if(in_array($rule,$list)) return $list;
+      if(in_array($rule,$list)) return $list;
 
-        return false;
+      return false;
 
 
 
@@ -136,18 +81,18 @@ class Auth {
     /**
      * 获取权限列表
      * Create by Peter
-     * @param $uid   用户id
+     * @param $uid
      * @return array|bool
      */
-    protected function getRuleList($uid){
+   protected function getRuleList($uid){
 
 
         $re=Db::table($this->group_access)
             ->alias('ga')
             ->join($this->auth_group." ag",'ga.group_id = ag.id','left')
             ->where('ga.uid',$uid)
-            ->find()
-        ;
+            ->find();
+
 
 
         if(!$re) return [];
@@ -164,7 +109,7 @@ class Auth {
         if(!$res) return [];
 
 
-        //取这个数组列表name值，合并成新数组
+
         $res=array_column($res,'name');
 
         $arr=[];
@@ -219,5 +164,5 @@ class Auth {
 
 
 
-
 }
+
